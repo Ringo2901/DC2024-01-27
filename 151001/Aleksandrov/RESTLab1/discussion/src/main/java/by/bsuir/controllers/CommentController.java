@@ -62,12 +62,12 @@ public class CommentController {
     }
 
     @PostMapping
-    public CommentResponseTo saveComment(@RequestHeader("Accept-Language") String acceptLanguageHeader, @RequestBody CommentRequestTo comment) {
+    public CommentResponseTo saveComment(@RequestHeader(value = "Accept-Language", defaultValue = "en") String acceptLanguageHeader, @RequestBody CommentRequestTo comment) {
         return commentService.saveComment(comment, acceptLanguageHeader);
     }
 
     @PutMapping()
-    public CommentResponseTo updateComment(@RequestHeader("Accept-Language") String acceptLanguageHeader, @RequestBody CommentRequestTo comment) {
+    public CommentResponseTo updateComment(@RequestHeader(value = "Accept-Language", defaultValue = "en") String acceptLanguageHeader, @RequestBody CommentRequestTo comment) {
         return commentService.updateComment(comment, acceptLanguageHeader);
     }
 

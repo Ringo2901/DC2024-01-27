@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "tbl_editor", schema = "distcomp")
+@Table(name = "tbl_editor", schema = "public")
 public class Editor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

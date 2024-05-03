@@ -3,6 +3,8 @@ package by.bsuir.controllers;
 import by.bsuir.dto.CommentRequestTo;
 import by.bsuir.dto.CommentResponseTo;
 import by.bsuir.exceptions.NotFoundException;
+import by.bsuir.repository.IssueRepository;
+import jakarta.validation.Valid;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -16,6 +18,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClient;
 
@@ -25,6 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1.0/comments")
 @CacheConfig(cacheNames = "commentCache")
+@Validated
 public class CommentController {
     @Autowired
     private RestClient restClient;
@@ -34,6 +38,8 @@ public class CommentController {
     private KafkaSender kafkaSender;
     @Autowired
     private CacheManager cacheManager;
+    @Autowired
+    private IssueRepository issueRepository;
     private String inTopic = "InTopic";
     private String outTopic = "OutTopic";
     private String uriBase = "http://localhost:24130/api/v1.0/comments";
@@ -88,9 +94,12 @@ public class CommentController {
     }
 
     @PostMapping
-    public ResponseEntity<CommentResponseTo> saveComment(@RequestHeader(value = "Accept-Language", defaultValue = "en") String acceptLanguageHeader, @RequestBody CommentRequestTo comment) throws NotFoundException {
+    public ResponseEntity<CommentResponseTo> saveComment(@RequestHeader(value = "Accept-Language", defaultValue = "en") String acceptLanguageHeader, @Valid @RequestBody CommentRequestTo comment) throws NotFoundException {
         comment.setCountry(acceptLanguageHeader);
         comment.setMethod("POST");
+        if (!issueRepository.existsById(comment.getIssueId())){
+            throw new NotFoundException("Issue not found!", 40400L);
+        }
         kafkaSender.sendCustomMessage(comment, inTopic);
         return ResponseEntity.status(201).body(listenKafka());
     }

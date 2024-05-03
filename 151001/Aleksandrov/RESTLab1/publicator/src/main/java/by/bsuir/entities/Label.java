@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tbl_label", schema = "distcomp")
+@Table(name = "tbl_label", schema = "public")
 public class Label {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -43,12 +43,13 @@ public class CommentService {
         return commentToCommentResponse(commentDao.save(commentToSave));
     }
 
-    public void deleteComment(Long id) throws DeleteException {
+    public int deleteComment(Long id) throws DeleteException {
         Optional<Comment> comment = commentDao.findById(id).stream().findFirst();
         if (comment.isEmpty()) {
-            throw new DeleteException("Comment not found!", 40004L);
+            return -1;
         } else {
             commentDao.deleteByCountryAndIssueIdAndId(comment.get().getCountry(), comment.get().getIssueId(), comment.get().getId());
+            return 1;
         }
     }
 

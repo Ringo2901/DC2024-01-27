@@ -4,7 +4,6 @@ import by.bsuir.dto.CommentRequestTo;
 import by.bsuir.dto.CommentResponseTo;
 import by.bsuir.services.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +27,7 @@ public class CommentController {
             if (commentRequestTo.getId() != null) {
                 kafkaSender.sendCustomMessage(getComment(commentRequestTo.getId()), topic);
             } else {
-               // kafkaSender.sendCustomMessage(getComments());
+                // kafkaSender.sendCustomMessage(getComments());
             }
         } else {
             if (Objects.equals(commentRequestTo.getMethod(), "DELETE")) {
@@ -57,8 +56,11 @@ public class CommentController {
 
     @DeleteMapping("/{id}")
     public CommentResponseTo deleteComment(@PathVariable Long id) {
-        commentService.deleteComment(id);
-        return new CommentResponseTo();
+        if (commentService.deleteComment(id) > 0) {
+            return new CommentResponseTo();
+        } else {
+            return null;
+        }
     }
 
     @PostMapping
